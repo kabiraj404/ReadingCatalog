@@ -1,112 +1,231 @@
-<!DOCTYPE html>
+<! DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Reading List</title>
+  <title>Reading List</title>
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: system-ui, sans-serif;
-      max-width: 600px;
-      margin: 2rem auto;
-      padding: 1rem;
-      background: #f9f9f9;
-      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background:  #ffffff;
+      color: #24292f;
+      line-height: 1.6;
+      padding: 2rem 1rem;
     }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
     h1 {
-      text-align: center;
       font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #24292f;
+    }
+
+    .subtitle {
+      color: #57606a;
       margin-bottom: 2rem;
+      font-size: 1rem;
     }
-    .card {
-      background: #fff;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+    #reading-list {
+      border-top: 1px solid #d0d7de;
     }
-    .card img {
-      max-width: 100%;
-      border-radius: 4px;
+
+    .article {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid #d0d7de;
+      transition: opacity 0.2s ease;
+    }
+
+    .article:hover {
+      opacity: 0.8;
+    }
+
+    .article-title {
+      font-size: 1.1rem;
+      font-weight:  500;
       margin-bottom: 0.5rem;
     }
-    .card h2 {
-      margin: 0 0 0.3rem;
-      font-size: 1.2rem;
-    }
-    .tag {
-      margin: 0.3rem 0 0;
-      font-size: 0.95rem;
-      color: #333;
-      font-weight: 500;
-    }
-    .description {
-      margin: 0.2rem 0 0;
-      font-size: 0.85rem;
-      color: #666;
-    }
-    a {
-      color: #007acc;
+
+    .article-title a {
+      color: #0969da;
       text-decoration: none;
     }
-    a:hover {
+
+    .article-title a:hover {
       text-decoration: underline;
     }
-    .footer {
+
+    .article-meta {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      color: #57606a;
+    }
+
+    .article-tag {
+      color: #24292f;
+      font-weight: 500;
+    }
+
+    .article-description {
+      font-size: 0.95rem;
+      color: #57606a;
+      margin-top: 0.5rem;
+    }
+
+    .article img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      margin-top: 0.75rem;
+      border: 1px solid #d0d7de;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #57606a;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 3rem;
+      color: #57606a;
+    }
+
+    . footer {
       text-align: center;
       margin-top: 3rem;
-      font-size: 0.9rem;
-      color: #888;
+      padding:  2rem 0;
+      color: #57606a;
+      font-size: 0.875rem;
+      border-top: 1px solid #d0d7de;
+    }
+
+    .footer code {
+      background: #f6f8fa;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+      font-size:  0.85em;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .article-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>📚 My Reading List</h1>
-  <div id="reading-list">Loading...</div>
-  <div class="footer">
-    Powered by GitHub Pages — Sourced from <code>list.json</code>
+  <div class="container">
+    <h1>My Reading List</h1>
+    <p class="subtitle">Random articles I read on the internet</p>
+
+    <div id="reading-list" class="loading">Loading...</div>
+    
+    <div class="footer">
+      Powered by GitHub Pages — Sourced from <code>list.json</code>
+    </div>
   </div>
+
   <script>
     async function fetchReadingList(retries = 3) {
       const container = document.getElementById('reading-list');
-      const url = 'readingList/list.json?t=' + new Date().getTime();
+      const url = 'readingList/list.json? t=' + new Date().getTime();
       
       for (let i = 0; i < retries; i++) {
         try {
+          container.className = 'loading';
           container.textContent = 'Loading...';
+          
           const response = await fetch(url, { cache: "no-store" });
-          if (!response.ok) throw new Error('HTTP error! status: ' + response.status);
+          if (!response.ok) throw new Error('HTTP error! status: ' + response. status);
           
           const data = await response.json();
-          container.innerHTML = '';
           
-          if (!data.length) {
-            container.innerHTML = '<p>No articles found.</p>';
-            return;
-          }
-    
-          const currentDate = new Date().toLocaleDateString();
-    
-          data.forEach(item => {
-            const displayDate = item.date ? item.date : currentDate;
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = '<h2><a href="' + item.url + '" target="_blank" rel="noopener noreferrer">' + item.title + '</a><small style="font-weight:normal; font-size:0.8rem; color:#666; margin-left:0.5rem;">(' + displayDate + ')</small></h2>' + (item.tag ? '<p class="tag">' + item.tag + '</p>' : '') + (item.description ? '<p class="description">' + item.description + '</p>' : '');
-            container.appendChild(card);
-          });
+          renderArticles(data);
+          
           return;
         } catch (error) {
           console.warn('Fetching attempt ' + (i + 1) + ' failed:', error);
           if (i === retries - 1) {
+            container.className = 'no-results';
             container.innerHTML = '<p>Failed to load reading list. Please try again later.</p>';
-            console.error('Error loading list.json:', error);
+            console.error('Error loading list. json:', error);
           } else {
             await new Promise(res => setTimeout(res, 1000));
           }
         }
       }
     }
-    
+
+    function renderArticles(articles) {
+      const container = document.getElementById('reading-list');
+      container.className = '';
+      container.innerHTML = '';
+      
+      if (! articles. length) {
+        container.className = 'no-results';
+        container.innerHTML = '<p>No articles found. </p>';
+        return;
+      }
+
+      const currentDate = new Date().toLocaleDateString();
+
+      articles.forEach((item) => {
+        const displayDate = item.date ?  item.date : currentDate;
+        const article = document.createElement('div');
+        article.className = 'article';
+        
+        let content = '<div class="article-title">';
+        content += '<a href="' + item.url + '" target="_blank" rel="noopener noreferrer">' + item.title + '</a>';
+        content += '</div>';
+        
+        content += '<div class="article-meta">';
+        if (item.tag) {
+          content += '<span class="article-tag">' + item. tag + '</span>';
+        }
+        content += '<span>' + displayDate + '</span>';
+        content += '</div>';
+        
+        if (item.description) {
+          content += '<div class="article-description">' + item.description + '</div>';
+        }
+        
+        if (item.image) {
+          content += '<img src="' + item.image + '" alt="' + item.title + '" loading="lazy" />';
+        }
+        
+        article.innerHTML = content;
+        container.appendChild(article);
+      });
+    }
+
+    // Initialize
     fetchReadingList();
   </script>
 </body>
