@@ -69,7 +69,9 @@
   <script>
     async function fetchReadingList(retries = 3) {
       const container = document.getElementById('reading-list');
-      const url = `list.json?t=${new Date().getTime()}`; // Cache-bust with timestamp
+      // Get the base path - works whether served from root or subdirectory
+      const basePath = window.location.pathname.includes('/ReadingCatalog') ? '/ReadingCatalog/readingList/' : './';
+      const url = `${basePath}list.json?t=${new Date().getTime()}`; // Cache-bust with timestamp
       
       for (let i = 0; i < retries; i++) {
         try {
