@@ -15,39 +15,57 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
       background:  #ffffff;
       color: #24292f;
-      line-height: 1.6;
-      padding: 2rem 1rem;
+      line-height: 1.5;
+      padding: 1.5rem 1rem;
       max-width: 680px;
       margin: 0 auto;
     }
 
     h1 {
       font-size: 1.75rem;
-      font-weight: 600;
+      font-weight:  600;
       margin-bottom: 0.25rem;
       color: #24292f;
     }
 
     .subtitle {
       color: #57606a;
-      margin-bottom: 2. 5rem;
-      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
     }
 
     #reading-list {
       border-top: 1px solid #e1e4e8;
     }
 
+    .month-divider {
+      padding: 1rem 0 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #24292f;
+      border-top: 1px solid #d0d7de;
+      margin-top: 0.5rem;
+    }
+
+    . month-divider:first-child {
+      border-top: none;
+      margin-top: 0;
+    }
+
     .article {
-      padding: 1.25rem 0;
-      border-bottom: 1px solid #e1e4e8;
+      padding: 0. 75rem 0;
+      border-bottom: 1px solid #f6f8fa;
+    }
+
+    .article:last-child {
+      border-bottom: none;
     }
 
     .article-title {
-      font-size: 1rem;
-      font-weight: 500;
-      margin-bottom:  0.4rem;
-      line-height: 1.5;
+      font-size: 0.95rem;
+      font-weight:  500;
+      margin-bottom: 0.25rem;
+      line-height: 1.4;
     }
 
     .article-title a {
@@ -59,11 +77,18 @@
       text-decoration: underline;
     }
 
+    .article-description {
+      font-size: 0.8125rem;
+      color: #6e7781;
+      margin-bottom: 0.25rem;
+      line-height:  1.4;
+    }
+
     .article-meta {
       display: flex;
       gap: 0.75rem;
-      font-size: 0.8125rem;
-      color: #57606a;
+      font-size: 0.75rem;
+      color: #6e7781;
     }
 
     .article-tag {
@@ -71,7 +96,7 @@
     }
 
     .article-date {
-      color: #6e7781;
+      color: #8b949e;
     }
 
     .loading {
@@ -85,21 +110,21 @@
       text-align: center;
       padding: 3rem;
       color: #57606a;
-      font-size: 0.9rem;
+      font-size:  0.9rem;
     }
 
     .footer {
       text-align: center;
-      margin-top: 3rem;
-      padding:  2rem 0 0;
-      color: #6e7781;
-      font-size: 0.8125rem;
+      margin-top: 2.5rem;
+      padding:  1.5rem 0 0;
+      color: #8b949e;
+      font-size: 0.75rem;
       border-top: 1px solid #e1e4e8;
     }
 
     @media (max-width: 600px) {
       body {
-        padding: 1.5rem 1rem;
+        padding: 1.25rem 1rem;
       }
 
       h1 {
@@ -107,7 +132,7 @@
       }
 
       . article-meta {
-        flex-direction:  column;
+        flex-direction: column;
         gap: 0.25rem;
       }
     }
@@ -125,7 +150,7 @@
 
   <script>
     async function fetchReadingList(retries = 3) {
-      const container = document. getElementById('reading-list');
+      const container = document.getElementById('reading-list');
       const url = 'readingList/list.json? t=' + new Date().getTime();
       
       for (let i = 0; i < retries; i++) {
@@ -154,6 +179,27 @@
       }
     }
 
+    function parseDate(dateString) {
+      // Handle dates in format YYYY-MM-DD
+      const parts = dateString.split('-');
+      if (parts.length === 3) {
+        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      }
+      return new Date(dateString);
+    }
+
+    function formatMonthYear(dateString) {
+      const date = parseDate(dateString);
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+      return months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+
+    function getYearMonth(dateString) {
+      const date = parseDate(dateString);
+      return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+    }
+
     function renderArticles(articles) {
       const container = document.getElementById('reading-list');
       container.className = '';
@@ -161,23 +207,39 @@
       
       if (! articles.length) {
         container.className = 'no-results';
-        container.innerHTML = '<p>No articles found. </p>';
+        container.innerHTML = '<p>No articles found.</p>';
         return;
       }
 
-      const currentDate = new Date().toLocaleDateString();
+      const currentDate = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format
+      let currentMonth = null;
 
       articles.forEach((item) => {
         const displayDate = item.date ?  item.date : currentDate;
+        const articleMonth = getYearMonth(displayDate);
+        
+        // Add month divider if month changed
+        if (articleMonth !== currentMonth) {
+          const monthDivider = document.createElement('div');
+          monthDivider.className = 'month-divider';
+          monthDivider.textContent = formatMonthYear(displayDate);
+          container.appendChild(monthDivider);
+          currentMonth = articleMonth;
+        }
+        
         const article = document.createElement('div');
         article.className = 'article';
         
         let content = '<div class="article-title">';
-        content += '<a href="' + item. url + '" target="_blank" rel="noopener noreferrer">' + item.title + '</a>';
+        content += '<a href="' + item.url + '" target="_blank" rel="noopener noreferrer">' + item.title + '</a>';
         content += '</div>';
         
+        if (item.description) {
+          content += '<div class="article-description">' + item.description + '</div>';
+        }
+        
         content += '<div class="article-meta">';
-        if (item.tag) {
+        if (item. tag) {
           content += '<span class="article-tag">' + item.tag + '</span>';
         }
         content += '<span class="article-date">' + displayDate + '</span>';
