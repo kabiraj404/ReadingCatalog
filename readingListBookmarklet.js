@@ -1,5 +1,5 @@
 javascript:(() => {
-    const requestURL = "https://127.0.0.1:8080/api/readingList";
+    const requestURL = "http://127.0.0.1:8080/api/readingList";
     const token = "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";
 
     const pageTitle = document.title;
