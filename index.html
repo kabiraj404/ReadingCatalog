@@ -1,4 +1,4 @@
-<! DOCTYPE html>
+<!  DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -13,17 +13,17 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      background:  #ffffff;
+      background:   #ffffff;
       color: #24292f;
       line-height: 1.5;
-      padding: 1.5rem 1rem;
+      padding: 1. 5rem 1rem;
       max-width: 680px;
       margin: 0 auto;
     }
 
     h1 {
       font-size: 1.75rem;
-      font-weight:  600;
+      font-weight:   600;
       margin-bottom: 0.25rem;
       color: #24292f;
     }
@@ -47,13 +47,13 @@
       margin-top: 0.5rem;
     }
 
-    . month-divider:first-child {
+    . month-divider: first-child {
       border-top: none;
       margin-top: 0;
     }
 
     .article {
-      padding: 0. 75rem 0;
+      padding: 0.75rem 0;
       border-bottom: 1px solid #f6f8fa;
     }
 
@@ -61,27 +61,30 @@
       border-bottom: none;
     }
 
-    .article-title {
+    .article-title-line {
       font-size: 0.95rem;
-      font-weight:  500;
-      margin-bottom: 0.25rem;
       line-height: 1.4;
+      margin-bottom: 0.25rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow:  hidden;
     }
 
-    .article-title a {
+    .article-title-line a {
       color: #0969da;
       text-decoration: none;
+      font-weight: 500;
     }
 
-    .article-title a:hover {
+    .article-title-line a:hover {
       text-decoration: underline;
     }
 
-    .article-description {
-      font-size: 0.8125rem;
+    .article-description-inline {
       color: #6e7781;
-      margin-bottom: 0.25rem;
-      line-height:  1.4;
+      font-size: 0.875rem;
+      font-weight: 400;
     }
 
     .article-meta {
@@ -110,13 +113,13 @@
       text-align: center;
       padding: 3rem;
       color: #57606a;
-      font-size:  0.9rem;
+      font-size: 0.9rem;
     }
 
     .footer {
       text-align: center;
       margin-top: 2.5rem;
-      padding:  1.5rem 0 0;
+      padding:   1.5rem 0 0;
       color: #8b949e;
       font-size: 0.75rem;
       border-top: 1px solid #e1e4e8;
@@ -200,6 +203,13 @@
       return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
     }
 
+    function truncateDescription(text, wordLimit = 10) {
+      if (! text) return '';
+      const words = text.split(' ');
+      if (words.length <= wordLimit) return text;
+      return words.slice(0, wordLimit).join(' ') + '...';
+    }
+
     function renderArticles(articles) {
       const container = document.getElementById('reading-list');
       container.className = '';
@@ -223,20 +233,22 @@
           const monthDivider = document.createElement('div');
           monthDivider.className = 'month-divider';
           monthDivider.textContent = formatMonthYear(displayDate);
-          container.appendChild(monthDivider);
+          container. appendChild(monthDivider);
           currentMonth = articleMonth;
         }
         
         const article = document.createElement('div');
         article.className = 'article';
         
-        let content = '<div class="article-title">';
+        let content = '<div class="article-title-line">';
         content += '<a href="' + item.url + '" target="_blank" rel="noopener noreferrer">' + item.title + '</a>';
-        content += '</div>';
         
         if (item.description) {
-          content += '<div class="article-description">' + item.description + '</div>';
+          const shortDesc = truncateDescription(item.description, 10);
+          content += ' <span class="article-description-inline">— ' + shortDesc + '</span>';
         }
+        
+        content += '</div>';
         
         content += '<div class="article-meta">';
         if (item. tag) {
